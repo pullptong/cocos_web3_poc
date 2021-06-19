@@ -9,15 +9,17 @@ const isWeb3Enabled = () => {
     return !!w.web3
 }
 
-export interface IServerResponse {
-    data: any | null,
-    error: { code: string, message: string } | null
+export interface IRequestAccountResponse {
+    accounts: string[]
 }
 
-export interface IRequestAccountResponse extends IServerResponse {
-    data: {
-        accounts: string[]
-    } | null
+export interface IRequestBalanceResponse {
+    balance: number
+}
+
+export interface IError {
+    code: string,
+    message: string
 }
 
 
@@ -66,7 +68,7 @@ export default class Web3Controller {
                         })
                         .catch((error: any) => {
                             console.error(error);
-                            resolve({ data: null, error: { code: "", message: "You must enable and login into your TomoWallet or MetaMask accounts!" } });
+                            reject({ code: "", message: "You must enable and login into your TomoWallet or MetaMask accounts!" });
                         });
                 } else if (w.web3) {
                     this.web3ProviderName = "tomowallet";
@@ -87,7 +89,7 @@ export default class Web3Controller {
                 // }
             }
             else {
-                resolve({ data: null, error: { code: "", message: "You must enable and login into your TomoWallet or MetaMask accounts!" } });
+                reject({ code: "", message: "You must enable and login into your TomoWallet or MetaMask accounts!" });
             }
         });
     }
@@ -108,15 +110,15 @@ export default class Web3Controller {
                 if (accounts.length > 0) {
                     Web3Controller.instance.currentAccount = accounts[0].toLowerCase();
                     console.log('getAccounts', accounts);
-                    resolve({ data: { accounts: accounts }, error: null })
+                    resolve({ accounts: accounts });
                 } else {
-                    resolve({ data: null, error: { code: "", message: "You must enable and login into your TomoWallet or MetaMask accounts!" } });
+                    reject({ code: "", message: "You must enable and login into your TomoWallet or MetaMask accounts!" });
                 }
             });
         });
     }
 
-    public getBalance(): Promise<IServerResponse> {
+    public getBalance(): Promise<IRequestBalanceResponse> {
         console.log('request getBalance');
         return new Promise((resolve, reject) => {
             this.web3.eth.getBalance(
@@ -124,11 +126,11 @@ export default class Web3Controller {
                 (err: Error, balance: number) => {
                     if (err) {
                         console.error(err);
-                        resolve({ data: null, error: { code: "", message: err.message } })
+                        reject({ code: "", message: err.message })
                         return;
                     }
                     console.log('balance', balance);
-                    resolve({ data: { balance: balance }, error: null });
+                    resolve({ balance: balance });
                 }
             );
         });
