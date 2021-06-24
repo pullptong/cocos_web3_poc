@@ -1,8 +1,8 @@
 
 
 import { JsonAsset } from "cc";
-// import * as Web3 from "web3";
-// import { EthApi, ContractAbi, Provider } from "web3";
+// import * as Web3 from "../../lib/web3";
+// import { EthApi, ContractAbi, Provider } from "../../lib/web3";
 
 const isWeb3Enabled = () => {
     let w = window as any;
